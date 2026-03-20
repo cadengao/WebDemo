@@ -1,0 +1,118 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSX格式的React 19 ESM示例</title>
+</head>
+<body>
+    <div id="root"></div>
+
+    <!-- 导入映射，指定 React 19 的 ES 模块 -->
+    <script type="importmap">
+        {
+            "imports": {
+                "react": "https://esm.sh/react@19.0.0",
+                "react-dom/client": "https://esm.sh/react-dom@19.0.0/client"
+            }
+        }
+    </script>
+
+    <!-- 引入 Babel 用于在浏览器中解析 JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- 主应用脚本，使用 JSX 语法 -->
+    <script type="text/babel" data-type="module">
+        import React, { useState } from 'react';
+        import { createRoot } from 'react-dom/client';
+
+        function Counter() {
+            const [count, setCount] = useState(0);
+
+            const buttonStyle = (baseColor, hoverColor) => ({
+                padding: '12px 24px',
+                fontSize: '16px',
+                backgroundColor: baseColor,
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                margin: '10px',
+                fontWeight: 'bold',
+                transition: 'background-color 0.3s'
+            });
+
+            return (
+                <div style={{
+                    fontFamily: 'Arial, sans-serif',
+                    textAlign: 'center',
+                    marginTop: '50px',
+                    padding: '20px'
+                }}>
+                    <h1>JSX格式的React 19 ESM示例</h1>
+                    <p style={{
+                        fontSize: '20px',
+                        marginBottom: '20px'
+                    }}>
+                        当前计数: {count}
+                    </p>
+
+                    <div style={{ marginTop: '20px' }}>
+                        <button
+                            onClick={() => setCount(count + 1)}
+                            style={buttonStyle('#007bff', '#0056b3')}
+                            onMouseOver={(e) => e.target.style.backgroundColor = '#0056b3'}
+                            onMouseOut={(e) => e.target.style.backgroundColor = '#007bff'}
+                        >
+                            增加计数
+                        </button>
+
+                        <button
+                            onClick={() => setCount(0)}
+                            style={buttonStyle('#6c757d', '#545b62')}
+                            onMouseOver={(e) => e.target.style.backgroundColor = '#545b62'}
+                            onMouseOut={(e) => e.target.style.backgroundColor = '#6c757d'}
+                        >
+                            重置计数
+                        </button>
+
+                        <button
+                            onClick={() => setCount(prev => Math.max(0, prev - 1))}
+                            style={buttonStyle('#28a745', '#1e7e34')}
+                            onMouseOver={(e) => e.target.style.backgroundColor = '#1e7e34'}
+                            onMouseOut={(e) => e.target.style.backgroundColor = '#28a745'}
+                        >
+                            减少计数
+                        </button>
+                    </div>
+
+                    <p style={{
+                        marginTop: '30px',
+                        fontSize: '14px',
+                        color: '#666'
+                    }}>
+                        使用 React 19、原生 ES 模块 (ESM) 和 JSX 语法
+                    </p>
+
+                    <div style={{
+                        marginTop: '20px',
+                        padding: '10px',
+                        backgroundColor: '#f8f9fa',
+                        borderRadius: '5px',
+                        fontSize: '12px',
+                        color: '#6c757d'
+                    }}>
+                        <p>此示例通过 Babel Standalone 在浏览器中实时编译 JSX 语法</p>
+                        <p>在实际项目中，建议使用构建工具如 Vite、Webpack 或 Rollup 来处理 JSX 编译</p>
+                    </div>
+                </div>
+            );
+        }
+
+        // 渲染应用
+        const rootElement = document.getElementById('root');
+        const root = createRoot(rootElement);
+        root.render(<Counter />);
+    </script>
+</body>
+</html>
