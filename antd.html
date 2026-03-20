@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ant Design 6 Demo</title>
+    <link href="https://unpkg.com/antd@6/dist/reset.css" rel="stylesheet">
+    <link href="https://unpkg.com/antd@6/dist/antd.css" rel="stylesheet">
+
+    <!-- 引入React和ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- 引入Babel用于JSX转换 -->
+    <script crossorigin src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- 引入dayjs解决日期处理问题 -->
+    <script src="https://unpkg.com/dayjs@1/dayjs.min.js"></script>
+    <script src="https://unpkg.com/dayjs@1/locale/zh-cn.min.js"></script>
+
+    <!-- 引入Ant Design CSS和JS -->
+    <script src="https://unpkg.com/antd@6/dist/antd-with-locales.min.js"></script>
+    <style>
+        :root {
+            --bg-table-header-bg: #828282;
+            --bg-table-header-color: white;
+            --border-radius-default: 2px;
+        }
+
+        body {
+            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #f0f0f0;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+    // 确保全局变量可用
+    const { useState } = React;
+    const { ConfigProvider, theme, Button, Table, Form, Input, Select, DatePicker, message, Card, Space } = antd;
+    const { zh_CN } = antd.locales;
+    // 正确获取dayjs
+    const dayjs = window.dayjs;
+
+    function App() {
+      const [formData, setFormData] = useState({
+        name: '',
+        gender: undefined,
+        birthDate: null
+      });
+      const [dataSource, setDataSource] = useState([
+        {
+          key: '1',
+          name: '张三',
+          gender: '男',
+          age: 32,
+          birthDate: '1990-01-01'
+        },
+        {
+          key: '2',
+          name: '李四',
+          gender: '女',
+          age: 28,
+          birthDate: '1994-05-15'
+        },
+      ]);
+
+      const columns = [
+        {
+          title: '姓名',
+          dataIndex: 'name',
+          key: 'name',
+        },
+        {
+          title: '性别',
+          dataIndex: 'gender',
+          key: 'gender',
+        },
+        {
+          title: '年龄',
+          dataIndex: 'age',
+          key: 'age',
+        },
+        {
+          title: '出生日期',
+          dataIndex: 'birthDate',
+          key: 'birthDate',
+        },
+        {
+          title: '操作',
+          key: 'action',
+          render: (_, record) => (
+            <Space size="middle">
+              <Button type="link" onClick={() => editRecord(record)}>编辑</Button>
+              <Button type="link" danger onClick={() => deleteRecord(record.key)}>删除</Button>
+            </Space>
+          ),
+        },
+      ];
+
+      const handleSubmit = () => {
+        if (!formData.name || !formData.gender || !formData.birthDate) {
+          message.warning('请填写完整信息');
+          return;
+        }
+
+        const newRecord = {
+          key: Date.now().toString(),
+          name: formData.name,
+          gender: formData.gender,
+          age: calculateAge(formData.birthDate),
+          birthDate: formData.birthDate.format('YYYY-MM-DD')
+        };
+
+        setDataSource([...dataSource, newRecord]);
+        setFormData({
+          name: '',
+          gender: undefined,
+          birthDate: null
+        });
+        message.success('添加成功');
+      };
+
+      const editRecord = (record) => {
+        setFormData({
+          name: record.name,
+          gender: record.gender,
+          birthDate: record.birthDate ? dayjs(record.birthDate) : null
+        });
+      };
+
+      const deleteRecord = (key) => {
+        setDataSource(dataSource.filter(item => item.key !== key));
+        message.success('删除成功');
+      };
+
+      const calculateAge = (birthDate) => {
+        if (!birthDate) return 0;
+        const today = dayjs();
+        return today.diff(birthDate, 'year');
+      };
+
+      return (
+        <ConfigProvider locale={zh_CN} theme={{
+          token: {
+            borderRadius: 'var(--border-radius-default)',
+            Table: {
+              headerBg: 'var(--bg-table-header-bg)',
+              headerColor: 'var(--bg-table-header-color)',
+              headerSortActiveBg: 'DarkGray',
+              headerSortHoverBg: 'DarkGray',
+            }
+          }
+        }}>
+          <div className="container">
+            <h1>Ant Design 组件示例</h1>
+
+            <Card title="按钮示例" className="section">
+              <Space>
+                <Button type="primary">主按钮</Button>
+                <Button>默认按钮</Button>
+                <Button type="dashed">虚线按钮</Button>
+                <Button type="text">文本按钮</Button>
+                <Button type="link">链接按钮</Button>
+                <Button danger>危险按钮</Button>
+              </Space>
+            </Card>
+
+            <Card title="表单示例" className="section">
+              <Form layout="vertical">
+                <Form.Item label="姓名">
+                  <Input
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    allowClear
+                    placeholder="请输入姓名"
+                  />
+                </Form.Item>
+
+                <Form.Item label="性别">
+                  <Select
+                    value={formData.gender}
+                    onChange={(value) => setFormData({ ...formData, gender: value })}
+                    placeholder="请选择性别"
+                  >
+                    <Select.Option value="男">男</Select.Option>
+                    <Select.Option value="女">女</Select.Option>
+                  </Select>
+                </Form.Item>
+
+                <Form.Item label="出生日期">
+                  <DatePicker
+                    value={formData.birthDate}
+                    onChange={(date) => setFormData({ ...formData, birthDate: date })}
+                    style={{ width: '100%' }}
+                  />
+                </Form.Item>
+
+                <Form.Item>
+                  <Button type="primary" onClick={handleSubmit}>
+                    提交
+                  </Button>
+                </Form.Item>
+              </Form>
+            </Card>
+
+            <Card title="表格示例" className="section">
+              <Table
+                dataSource={dataSource}
+                columns={columns}
+                bordered
+                pagination={{ pageSize: 5 }}
+              />
+            </Card>
+          </div>
+        </ConfigProvider>
+
+      );
+    }
+
+    // 渲染应用
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+    </script>
+</body>
+
+</html>
